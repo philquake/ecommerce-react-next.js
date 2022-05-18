@@ -5,3 +5,5 @@ export const FooterBanner = () => {
     <div>FooterBanner</div>
   )
 }
+
+export default FooterBanner;

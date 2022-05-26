@@ -4,32 +4,39 @@ import {toast} from 'react-hot-toast';
 const Context = createContext();
 
 export const StateContext = ({children})=> { 
-    const [showCart, setshowCart] = useState(false);
-    const [cartItems, setcartItems] = useState();
-    const [totalPrice, settotalPrice] = useState();
-    const [totalQuantities, settotalQuantities] = useState();
+    const [showCart, setShowCart] = useState(false);
+    const [cartItems, setCartItems] = useState([]);
+    const [totalPrice, setTotalPrice] = useState(0);
+    const [totalQuantities, setTotalQuantities] = useState(0);
     const [qty, setQty] = useState(1);
 
     /**
      * If the product is already in the cart, then update the total price and total quantity, and
      * update the quantity of the product in the cart.
      * @param prodcut - the product that is being added to the cart
-     * @param quanitity - the number of items the user wants to add to the cart
+     * @param quantity - the number of items the user wants to add to the cart
      */
-    const onAdd = (prodcut, quanitity) => {
+    const onAdd = (product, quantity) => {
        const checkProductInCart  = cartItems.find((item) => item._id === product._id);
 
-       if(checkProductInCart) {
-            setTotalPrice((prevTotalPrice) => prevTotalPrice + product.price * quantity);
-            settotalQuantities((prevTotalQuantities) => prevTotalQuantities + quantity);
+       setTotalPrice((prevTotalPrice) => prevTotalPrice + product.price * quantity);
+       setTotalQuantities((prevTotalQuantities) => prevTotalQuantities + quantity);
 
+       if(checkProductInCart) {
             const updatedCartItem =cartItems.map((cartProduct) => {
                 if(cartProduct._id ===product._id) return{
                     ...cartProduct,
                     quantity: cartProduct.quantity + quantity
                 }
             })
+
+            setCartItems(updatedCartItems);
+        } else {
+            product.quantity = quantity;
+
+            setCartItems([...cartItems, {...product}]);
        }
+       toast.success(`${qty} ${product.name} added to the cart.`);
     }
 
     const incQty = () => {
@@ -44,12 +51,14 @@ export const StateContext = ({children})=> {
     return(
         <Context.Provider value={{
             showCart,
+            setShowCart,
             cartItems,
             totalPrice,
             totalQuantities,
             qty,
             incQty,
             decQty,
+            onAdd,
         }}>
             {children}
         </Context.Provider>
